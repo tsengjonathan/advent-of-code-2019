@@ -4,9 +4,11 @@ const instructions = fs.readFileSync('data/05.txt', 'utf8').split(',').map(str =
 
 const jumpIndexes = [0, 4, 4, 2, 2, 3, 3, 4, 4];
 
-function runIncodeComputer(instArgs, inputs) {
+function runIncodeComputer(instArgs, inputs, shouldPrint) {
   const instructions = instArgs.slice();
   let idx = 0;
+  let finalVal = undefined;
+
   while (idx < instructions.length) {
     const instruction = instructions[idx].toString().padStart(5, '0');
     const opcode = parseInt(instruction.substring(instruction.length - 2));
@@ -22,7 +24,10 @@ function runIncodeComputer(instArgs, inputs) {
     } else if (opcode === 3) {
       instructions[argA] = inputs.shift();
     } else if (opcode === 4) {
-      console.log(numA);
+      finalVal = numA;
+      if (shouldPrint) {
+        console.log(numA);
+      }
     } else if (opcode === 5) {
       if (numA !== 0) {
         idx = numB;
@@ -45,11 +50,11 @@ function runIncodeComputer(instArgs, inputs) {
 
     idx += jumpIndexes[opcode];
   }
+
+  return finalVal;
 }
 
-console.log('Part 1:');
-runIncodeComputer(instructions, [1]);
-console.log('Part 2:');
-runIncodeComputer(instructions, [5]);
+console.log(`Part 1: ${runIncodeComputer(instructions, [1], false)}`);
+console.log(`Part 2: ${runIncodeComputer(instructions, [5], false)}`);
 
 export default runIncodeComputer;
