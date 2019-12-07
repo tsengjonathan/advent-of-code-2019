@@ -1,6 +1,6 @@
 const jumpIndexes = [0, 4, 4, 2, 2, 3, 3, 4, 4];
 
-function runIncodeComputer(instArgs, inputs, shouldPrint) {
+function runIncodeComputer(instArgs, inputs, shouldPrint = false) {
   const instructions = instArgs.slice();
   let idx = 0;
   let finalVal = undefined;
