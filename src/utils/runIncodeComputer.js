@@ -1,9 +1,7 @@
 const jumpIndexes = [0, 4, 4, 2, 2, 3, 3, 4, 4];
 
-function runIncodeComputer(instArgs, inputs, shouldPrint = false) {
+function runIncodeComputer(instArgs, inputs, idx = 0, finalVal = undefined, shouldPrint = false) {
   const instructions = instArgs.slice();
-  let idx = 0;
-  let finalVal = undefined;
 
   while (idx < instructions.length) {
     const instruction = instructions[idx].toString().padStart(5, '0');
@@ -13,16 +11,39 @@ function runIncodeComputer(instArgs, inputs, shouldPrint = false) {
     const numA = modeA === 0 ? instructions[argA] : argA;
     const numB = modeB === 0 ? instructions[argB] : argB;
 
+    if (instructions.includes(NaN)) {
+      throw new Error(`NaN at index ${instructions.indexOf(NaN)}`);
+    } else if (instructions.includes(undefined)) {
+      throw new Error(`undefined at index ${instructions.indexOf(undefined)}`);
+    }
+
     if (opcode === 1) {
       instructions[argC] = numA + numB;
     } else if (opcode === 2) {
       instructions[argC] = numA * numB;
     } else if (opcode === 3) {
+      if (inputs.length === 0) {
+        return {
+          output: finalVal,
+          reason: opcode,
+          index: idx, 
+          instructions: instructions,
+        }
+      }
       instructions[argA] = inputs.shift();
     } else if (opcode === 4) {
-      finalVal = numA;
       if (shouldPrint) {
         console.log(numA);
+      }
+      finalVal = numA;
+
+      if (finalVal !== 0) {
+        return {
+          output: finalVal,
+          reason: opcode,
+          index: idx + jumpIndexes[opcode],
+          instructions: instructions,
+        };
       }
     } else if (opcode === 5) {
       if (numA !== 0) {
@@ -41,13 +62,17 @@ function runIncodeComputer(instArgs, inputs, shouldPrint = false) {
     } else if (opcode === 99) {
       break;
     } else {
-      throw new Error(`Unrecognized opcode ${opcode}`);
+      throw new Error(`Unrecognized opcode ${opcode} at index ${idx}`);
     }
-
     idx += jumpIndexes[opcode];
   }
 
-  return finalVal;
+  return {
+    output: finalVal,
+    reason: 99,
+    index: idx,
+    instructions: instructions,
+  };
 }
 
 export default runIncodeComputer;
