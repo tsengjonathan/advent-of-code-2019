@@ -1,26 +1,47 @@
-const jumpIndexes = [0, 4, 4, 2, 2, 3, 3, 4, 4];
+const jumpIndexes = [0, 4, 4, 2, 2, 3, 3, 4, 4, 2];
 
-function runIncodeComputer(instArgs, inputs, idx = 0, finalVal = undefined, shouldPrint = false) {
+function runIncodeComputer(instArgs, inputs, idx = 0, finalVal = undefined, overrideReturn = false) {
   const instructions = instArgs.slice();
+  let relativeBase = 0;
 
-  while (idx < instructions.length) {
+  function getNumberFromMode(mode, arg) {
+    let pos = -1;
+    if (mode === 0) {
+      pos = arg;
+    } else if (mode === 1) {
+      return arg;
+    } else if (mode === 2) {
+      pos = relativeBase + arg;
+    }
+
+    if (pos > instructions.length || instructions[pos] === undefined) {
+      instructions[pos] = 0;
+    }
+
+    return instructions[pos];
+  }
+
+  const instructionsCount = instructions.length;
+
+  while (idx < instructionsCount) {
     const instruction = instructions[idx].toString().padStart(5, '0');
     const opcode = parseInt(instruction.substring(instruction.length - 2));
-    const [modeB, modeA] = instruction.substring(1, 3).split('').map(str => parseInt(str));
+    const [modeC, modeB, modeA] = instruction.substring(0, 3).split('').map(str => parseInt(str));
     const [argA, argB, argC] = instructions.slice(idx + 1, idx + 4);
-    const numA = modeA === 0 ? instructions[argA] : argA;
-    const numB = modeB === 0 ? instructions[argB] : argB;
+    const numA = getNumberFromMode(modeA, argA);
+    const numB = getNumberFromMode(modeB, argB);
+    const posA = modeA === 0 ? argA : relativeBase + argA;
+    const posB = modeB === 0 ? argB : relativeBase + argB;
+    const posC = modeC === 0 ? argC : relativeBase + argC;
 
     if (instructions.includes(NaN)) {
       throw new Error(`NaN at index ${instructions.indexOf(NaN)}`);
-    } else if (instructions.includes(undefined)) {
-      throw new Error(`undefined at index ${instructions.indexOf(undefined)}`);
-    }
+    } 
 
     if (opcode === 1) {
-      instructions[argC] = numA + numB;
+      instructions[posC] = numA + numB;
     } else if (opcode === 2) {
-      instructions[argC] = numA * numB;
+      instructions[posC] = numA * numB;
     } else if (opcode === 3) {
       if (inputs.length === 0) {
         return {
@@ -30,14 +51,11 @@ function runIncodeComputer(instArgs, inputs, idx = 0, finalVal = undefined, shou
           instructions: instructions,
         }
       }
-      instructions[argA] = inputs.shift();
+      const val = inputs.shift();
+      instructions[posA] = val;
     } else if (opcode === 4) {
-      if (shouldPrint) {
-        console.log(numA);
-      }
       finalVal = numA;
-
-      if (finalVal !== 0) {
+      if (finalVal !== 0 && !overrideReturn) {
         return {
           output: finalVal,
           reason: opcode,
@@ -53,12 +71,14 @@ function runIncodeComputer(instArgs, inputs, idx = 0, finalVal = undefined, shou
     } else if (opcode === 6) {
       if (numA === 0) {
         idx = numB;
-        continue
+        continue;
       }
     } else if (opcode === 7) {
-      instructions[argC] = numA < numB ? 1 : 0;
+      instructions[posC] = numA < numB ? 1 : 0;
     } else if (opcode === 8) {
-      instructions[argC] = numA === numB ? 1 : 0;
+      instructions[posC] = numA === numB ? 1 : 0;
+    } else if (opcode === 9) {
+      relativeBase += numA;
     } else if (opcode === 99) {
       break;
     } else {
