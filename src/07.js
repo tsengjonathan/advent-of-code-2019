@@ -1,7 +1,7 @@
 import fs from 'fs';
 import _ from 'lodash';
 
-import runIncodeComputer from './utils/runIncodeComputer';
+import runIntcode from './utils/runIntcode';
 
 const instructions = fs.readFileSync('data/07.txt', 'utf8').split(',').map(str => parseInt(str));
 
@@ -28,7 +28,7 @@ const permutations = generatePermutations([0, 1, 2, 3, 4]);
 permutations.forEach(permutation => {
   let signal = 0;
   permutation.forEach(phaseSetting => {
-    signal = runIncodeComputer(instructions, [phaseSetting, signal]).output;
+    signal = runIntcode(instructions, [phaseSetting, signal]).output;
   });
   maxThrusterSignal = Math.max(maxThrusterSignal, signal);
 });
@@ -45,7 +45,7 @@ feedbackLoopPermutations.forEach(permutation => {
   const settings = permutation.map((phaseSetting, idx) => idx === 0 ? [phaseSetting, 0] : [phaseSetting]);
   const ampInstructions = _.fill(Array(5), instructions);
   while (true) {
-    const program = runIncodeComputer(ampInstructions[ampIdx], settings[ampIdx], ampIndexes[ampIdx]);
+    const program = runIntcode(ampInstructions[ampIdx], settings[ampIdx], ampIndexes[ampIdx]);
     const nextIdx = (ampIdx + 1) % 5;
     
     ampIndexes[ampIdx] = program.index;

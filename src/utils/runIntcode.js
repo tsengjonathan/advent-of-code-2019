@@ -1,6 +1,6 @@
 const jumpIndexes = [0, 4, 4, 2, 2, 3, 3, 4, 4, 2];
 
-function runIncodeComputer(instArgs, inputs, idx = 0, finalVal = undefined, overrideReturn = false) {
+function runIntcode(instArgs, inputs, idx = 0, finalVal = undefined, overrideReturn = false) {
   const instructions = instArgs.slice();
   let relativeBase = 0;
 
@@ -95,4 +95,4 @@ function runIncodeComputer(instArgs, inputs, idx = 0, finalVal = undefined, over
   };
 }
 
-export default runIncodeComputer;
+export default runIntcode;
