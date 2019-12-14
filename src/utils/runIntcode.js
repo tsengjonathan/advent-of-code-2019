@@ -1,8 +1,9 @@
 const jumpIndexes = [0, 4, 4, 2, 2, 3, 3, 4, 4, 2];
 
-function runIntcode(instArgs, inputs, idx = 0, finalVal = undefined, overrideReturn = false) {
+function runIntcode(instArgs, inputs, idx = 0, finalVal = undefined, overrideReturn = false, base = 0) {
   const instructions = instArgs.slice();
-  let relativeBase = 0;
+  const outputs = [];
+  let relativeBase = base;
 
   function getNumberFromMode(mode, arg) {
     let pos = -1;
@@ -45,22 +46,25 @@ function runIntcode(instArgs, inputs, idx = 0, finalVal = undefined, overrideRet
     } else if (opcode === 3) {
       if (inputs.length === 0) {
         return {
-          output: finalVal,
+          output: outputs,
           reason: opcode,
           index: idx, 
           instructions: instructions,
+          base: relativeBase,
         }
       }
       const val = inputs.shift();
       instructions[posA] = val;
     } else if (opcode === 4) {
       finalVal = numA;
+      outputs.push(numA);
       if (finalVal !== 0 && !overrideReturn) {
         return {
           output: finalVal,
           reason: opcode,
           index: idx + jumpIndexes[opcode],
           instructions: instructions,
+          base: relativeBase,
         };
       }
     } else if (opcode === 5) {
@@ -92,6 +96,7 @@ function runIntcode(instArgs, inputs, idx = 0, finalVal = undefined, overrideRet
     reason: 99,
     index: idx,
     instructions: instructions,
+    base: relativeBase,
   };
 }
 
