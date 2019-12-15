@@ -1,7 +1,8 @@
 const jumpIndexes = [0, 4, 4, 2, 2, 3, 3, 4, 4, 2];
 
-function runIntcode(instArgs, inputs, idx = 0, finalVal = undefined, overrideReturn = false, base = 0) {
+function runIntcode(instArgs, inputArgs, idx = 0, finalVal = undefined, overrideReturn = false, base = 0) {
   const instructions = instArgs.slice();
+  const inputs = inputArgs.slice();
   const outputs = [];
   let relativeBase = base;
 
@@ -92,7 +93,7 @@ function runIntcode(instArgs, inputs, idx = 0, finalVal = undefined, overrideRet
   }
 
   return {
-    output: finalVal,
+    output: outputs,
     reason: 99,
     index: idx,
     instructions: instructions,
