@@ -1,5 +1,7 @@
 import fs from 'fs';
 
+import { gcd, lcm } from './utils/math';
+
 function compareValues(a, b) {
   return a < b ? 1 : a > b ? -1 : 0;
 }
@@ -71,17 +73,6 @@ for (let step = 0; step < 1000; step++) {
 
 const totalEnergy = moons.reduce((total, moon) => total + moon.totalEnergy(), 0);
 console.log(`Part 1: ${totalEnergy}`);
-
-function gcd(a, b) {
-  if (!b) {
-    return a;
-  }
-  return gcd(b, a % b);
-}
-
-function lcm(a, b) {
-  return (a * b) / gcd(a, b);
-}
 
 let loopX, loopY, loopZ;
 loopX = loopY = loopZ = undefined;
