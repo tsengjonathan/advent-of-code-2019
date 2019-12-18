@@ -61,7 +61,7 @@ function runIntcode(instArgs, inputArgs, idx = 0, finalVal = undefined, override
       outputs.push(numA);
       if (finalVal !== 0 && !overrideReturn) {
         return {
-          output: finalVal,
+          output: outputs,
           reason: opcode,
           index: idx + jumpIndexes[opcode],
           instructions: instructions,
