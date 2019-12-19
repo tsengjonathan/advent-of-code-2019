@@ -7,5 +7,7 @@ if (args.length > 0) {
   cp.fork(args[0]);
 } else {
   const files = fs.readdirSync('src/').filter(file => file.endsWith('.js'));
-  cp.fork(`src/${files.sort().pop()}`);
+  const file = `src/${files.sort().pop()}`;
+  console.log(`Running ${file}...`);
+  cp.fork(file);
 }
